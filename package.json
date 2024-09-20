@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Premium Dashboard for Bootstrap 5",
   "main": "dashboards/default.html",
-  "directories": {
-    "example": "root"
-  },
   "scripts": {
     "open-app": "gulp open-app",
     "start": "npm run open-app",
@@ -50,3 +47,4 @@
     "openai": "^4.63.0"
   }
 }
+
