@@ -32,6 +32,8 @@
   <link href="../../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="../../assets/css/corporate-ui-dashboard.css?v=1.0.0" rel="stylesheet" />
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet"/>
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
 </head>
 
 <body class="g-sidenav-show   bg-gray-100">
@@ -1208,7 +1210,6 @@
       <div class="mt-4 row">
         <div class="col-12">
           <div class="p-0 card-map card">
-            <div id="mapid" class="overflow-hidden leaflet"></div>
           </div>
         </div>
       </div>
@@ -1332,32 +1333,20 @@
   <!-- Kanban scripts -->
   <script src="../../assets/js/plugins/dragula/dragula.min.js"></script>
   <script src="../../assets/js/plugins/jkanban/jkanban.js"></script>
-  <script src="../../assets/js/plugins/leaflet.js"></script>
   <script src="../../assets/js/plugins/nouislider.min.js"></script>
   <script>
     // Initialize the map and assign it to a variable for later use
     // there's a few ways to declare a VARIABLE in javascript.
     // you might also see people declaring variables using `const` and `let`
-    var map = L.map('mapid', {
-      // Set latitude and longitude of the map center (required)
-      center: [37.728, -122.475],
-      fillColor: "#fff",
-      // fill: false,
-      color: "#fff",
-      // Set the initial zoom level, values 0-18, where 0 is most zoomed-out (required)
-      zoom: 15
-    });
-
+    var map = L.map('map').setView([37.728, -122.475], 15);
 
     // Create a Tile Layer and add it to the map
-    var tiles = new L.tileLayer('https://{s}.tile.jawg.io/jawg-sunny/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
-      attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       minZoom: 0,
       maxZoom: 22,
-      subdomains: 'abcd',
-      accessToken: 'ZpC8JXnSh7IVbHpOrZf5HywKIqd65v6CIpUuLpRkYPqy1vOSSxymrQBMdL0tQU3G'
+      subdomains: 'abcd'
     }).addTo(map);
-
 
     // Init slider
     var slider = document.getElementById("sliderRegular");
@@ -1368,6 +1357,39 @@
         min: 0,
         max: 100
       }
+    });
+  </script>
+  <div id="map" style="width: 100%; height: 500px;"></div>
+  <script>
+    mapboxgl.accessToken = "pk.eyJ1Ijoid2lsbGlhbXdyYXRoYm9ybmUiLCJhIjoiY2xzNHN3eWNxMTEwNjJrbjR6eHU2Y2VqYyJ9.Zwjc2U6uPHpantxLKryk6A";
+    var map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [-96.784517, 32.986541],
+      zoom: 14.5
+    });
+
+    // Function to fetch data and add to map
+    function loadData() {
+      fetch('http://127.0.0.1:5000/api/map-data')
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(point => {
+            if (point.location && point.location.longitude && point.location.latitude) {
+              const marker = new mapboxgl.Marker()
+                .setLngLat([point.location.longitude, point.location.latitude])
+                .setPopup(new mapboxgl.Popup({ offset: 25 })
+                  .setHTML('<h3>Sentiment Score: ' + point.sentiment_score + '</h3><p>Emotion Intensity: ' + point.emotion_intensity + '</p>'))
+                .addTo(map);
+            }
+          });
+        })
+        .catch(error => console.error('Error loading the data: ', error));
+    }
+
+    // Call loadData on map load
+    map.on('load', function () {
+      loadData();
     });
   </script>
   <script>

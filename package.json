@@ -44,7 +44,9 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "eslint": "^9.10.0",
-    "openai": "^4.63.0"
+    "express": "^4.21.0",
+    "mongoose": "^8.7.0",
+    "openai": "^4.63.0",
+    "three": "^0.169.0"
   }
 }
-
